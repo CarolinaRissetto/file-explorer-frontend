@@ -1,9 +1,5 @@
 import type { Folder, BreadcrumbSegment } from "@/types";
 
-/**
- * Builds an ordered breadcrumb path from a folder ID up to root.
- * Returns array starting from root → … → current folder.
- */
 export function buildBreadcrumbPath(
   folderId: string | null,
   allFolders: Folder[]

@@ -23,13 +23,11 @@ export function ExplorerView() {
   const [moveFileData, setMoveFileData] = useState<File | null>(null);
   const [renameData, setRenameData] = useState<{ id: string; name: string; type: "file" | "folder" } | null>(null);
 
-  // Data queries
   const { data: folders = [] } = useFolders(currentFolderId);
   const { data: allFolders = [] } = useAllFolders();
   const { data: allFiles = [] } = useAllFiles();
   const { data: files = [] } = useFiles(currentFolderId);
 
-  // Mutations
   const createFolder = useCreateFolder();
   const deleteFolder = useDeleteFolder();
   const createFile = useCreateFile();
@@ -39,13 +37,10 @@ export function ExplorerView() {
   const renameFile = useRenameFile();
   const renameFolder = useRenameFolder();
 
-  // Breadcrumb
   const breadcrumb = useBreadcrumb(currentFolderId, allFolders);
 
-  // Search
   const { query, setQuery, results, isSearching } = useSearch(currentFolderId);
 
-  // Drag & drop
   const { items: sortedFiles, draggedId, onDragStart, onDragOver, onDragEnd } =
     useDragAndDrop(isSearching ? results.files : files, (orderedIds) => {
       if (currentFolderId) {
@@ -119,7 +114,6 @@ export function ExplorerView() {
 
       <BreadcrumbNav segments={breadcrumb} onNavigate={setCurrentFolderId} />
 
-      {/* Toolbar */}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="flex-1">
           <SearchBar value={query} onChange={setQuery} />
@@ -134,7 +128,6 @@ export function ExplorerView() {
         </div>
       </div>
 
-      {/* Folders */}
       {displayedFolders.length > 0 && (
         <div className="mt-6">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -156,7 +149,6 @@ export function ExplorerView() {
         </div>
       )}
 
-      {/* Files */}
       {sortedFiles.length > 0 && (
         <div className="mt-6">
           <div className="mb-2 flex items-center justify-between">
@@ -186,7 +178,6 @@ export function ExplorerView() {
         </div>
       )}
 
-      {/* Dialogs */}
       <CreateDialog
         open={createType !== null}
         onClose={() => setCreateType(null)}

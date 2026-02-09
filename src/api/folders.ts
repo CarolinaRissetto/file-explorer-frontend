@@ -1,84 +1,35 @@
 import type { Folder } from "@/types";
-import { folders, files, generateId } from "./mockData";
-
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
+import { request } from "./client";
 
 export async function getFolders(parentId: string | null): Promise<Folder[]> {
-  await delay();
-  return folders.filter((f) => f.parentId === parentId);
+  const q = parentId === null ? "parentId=" : `parentId=${encodeURIComponent(parentId)}`;
+  return request<Folder[]>(`/folders?${q}`);
 }
 
 export async function getAllFolders(): Promise<Folder[]> {
-  await delay();
-  return [...folders];
+  return request<Folder[]>("/folders?all=true");
 }
 
-export async function createFolder(name: string, parentId: string | null): Promise<Folder> {
-  await delay();
-  const exists = folders.some(
-    (f) => f.parentId === parentId && f.name.toLowerCase() === name.toLowerCase()
-  );
-  if (exists) throw new Error(`Folder "${name}" already exists in this directory`);
-
-  const folder: Folder = {
-    id: generateId(),
-    name,
-    parentId,
-    createdAt: new Date().toISOString(),
-  };
-  folders.push(folder);
-  return folder;
+export async function createFolder(
+  name: string,
+  parentId: string | null
+): Promise<Folder> {
+  return request<Folder>("/folders", {
+    method: "POST",
+    body: JSON.stringify({ name, parentId }),
+  });
 }
 
-/** Cascading delete: removes folder + all nested subfolders and files */
 export async function deleteFolder(id: string): Promise<void> {
-  await delay();
-  const idsToDelete = collectDescendantFolderIds(id);
-  idsToDelete.push(id);
-
-  // Remove files in all deleted folders
-  for (let i = files.length - 1; i >= 0; i--) {
-    if (idsToDelete.includes(files[i].parentId)) {
-      files.splice(i, 1);
-    }
-  }
-
-  // Remove folders
-  for (let i = folders.length - 1; i >= 0; i--) {
-    if (idsToDelete.includes(folders[i].id)) {
-      folders.splice(i, 1);
-    }
-  }
+  return request(`/folders/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-function collectDescendantFolderIds(parentId: string): string[] {
-  const children = folders.filter((f) => f.parentId === parentId);
-  const ids: string[] = [];
-  for (const child of children) {
-    ids.push(child.id);
-    ids.push(...collectDescendantFolderIds(child.id));
-  }
-  return ids;
-}
-
-export async function renameFolder(id: string, newName: string): Promise<Folder> {
-  await delay();
-  const folder = folders.find((f) => f.id === id);
-  if (!folder) throw new Error("Folder not found");
-
-  const exists = folders.some(
-    (f) =>
-      f.parentId === folder.parentId &&
-      f.name.toLowerCase() === newName.toLowerCase() &&
-      f.id !== id
-  );
-  if (exists) throw new Error(`Folder "${newName}" already exists in this directory`);
-
-  const fileExists = files.some(
-    (f) => f.parentId === folder.parentId && f.name.toLowerCase() === newName.toLowerCase()
-  );
-  if (fileExists) throw new Error(`A file named "${newName}" already exists in this directory`);
-
-  folder.name = newName;
-  return { ...folder };
+export async function renameFolder(
+  id: string,
+  newName: string
+): Promise<Folder> {
+  return request<Folder>(`/folders/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name: newName }),
+  });
 }

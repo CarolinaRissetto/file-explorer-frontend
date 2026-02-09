@@ -1,13 +1,15 @@
 import type { File, Folder } from "@/types";
-import { folders, files } from "./mockData";
-
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
+import { getAllFolders } from "./folders";
+import { getAllFiles } from "./files";
 
 export async function searchAll(
   query: string,
   parentId?: string | null
 ): Promise<{ folders: Folder[]; files: File[] }> {
-  await delay();
+  const [folders, files] = await Promise.all([
+    getAllFolders(),
+    getAllFiles(),
+  ]);
   const q = query.toLowerCase();
 
   let matchedFolders = folders.filter((f) =>
@@ -19,7 +21,9 @@ export async function searchAll(
 
   if (parentId !== undefined) {
     matchedFolders = matchedFolders.filter((f) => f.parentId === parentId);
-    matchedFiles = matchedFiles.filter((f) => f.parentId === (parentId ?? "__root__"));
+    matchedFiles = matchedFiles.filter((f) =>
+      f.parentId === (parentId === null ? "__root__" : parentId)
+    );
   }
 
   return { folders: matchedFolders, files: matchedFiles };

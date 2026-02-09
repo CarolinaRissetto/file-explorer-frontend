@@ -9,7 +9,6 @@ export function useDragAndDrop(
   const [items, setItems] = useState<File[]>(files);
   const dragOverId = useRef<string | null>(null);
 
-  // Sync external files when they change
   if (
     files.length !== items.length ||
     files.some((f, i) => f.id !== items[i]?.id)

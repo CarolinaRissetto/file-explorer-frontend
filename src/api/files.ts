@@ -1,19 +1,17 @@
 import type { File } from "@/types";
-import { files, folders, generateId } from "./mockData";
+import { request } from "./client";
 
-const delay = (ms = 100) => new Promise((r) => setTimeout(r, ms));
+function parentQuery(parentId: string | null): string {
+  if (parentId === null) return "parentId=__root__";
+  return `parentId=${encodeURIComponent(parentId)}`;
+}
 
 export async function getFiles(parentId: string | null): Promise<File[]> {
-  await delay();
-  const pid = parentId ?? "__root__";
-  return files
-    .filter((f) => f.parentId === pid)
-    .sort((a, b) => a.order - b.order);
+  return request<File[]>(`/files?${parentQuery(parentId)}`);
 }
 
 export async function getAllFiles(): Promise<File[]> {
-  await delay();
-  return [...files];
+  return request<File[]>("/files?all=true");
 }
 
 export async function createFile(
@@ -21,91 +19,36 @@ export async function createFile(
   parentId: string,
   size: number
 ): Promise<File> {
-  await delay();
-  const exists = files.some(
-    (f) => f.parentId === parentId && f.name.toLowerCase() === name.toLowerCase()
-  );
-  if (exists) throw new Error(`File "${name}" already exists in this directory`);
-
-  // Also check no folder with same name
-  const folderExists = folders.some(
-    (f) => f.parentId === parentId && f.name.toLowerCase() === name.toLowerCase()
-  );
-  if (folderExists) throw new Error(`A folder named "${name}" already exists in this directory`);
-
-  const maxOrder = files
-    .filter((f) => f.parentId === parentId)
-    .reduce((max, f) => Math.max(max, f.order), -1);
-
-  const file: File = {
-    id: generateId(),
-    name,
-    parentId,
-    size,
-    order: maxOrder + 1,
-    createdAt: new Date().toISOString(),
-  };
-  files.push(file);
-  return file;
+  return request<File>("/files", {
+    method: "POST",
+    body: JSON.stringify({ name, parentId, size }),
+  });
 }
 
 export async function deleteFile(id: string): Promise<void> {
-  await delay();
-  const idx = files.findIndex((f) => f.id === id);
-  if (idx !== -1) files.splice(idx, 1);
+  return request(`/files/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
 export async function moveFile(id: string, newParentId: string): Promise<File> {
-  await delay();
-  const file = files.find((f) => f.id === id);
-  if (!file) throw new Error("File not found");
-
-  const exists = files.some(
-    (f) =>
-      f.parentId === newParentId &&
-      f.name.toLowerCase() === file.name.toLowerCase() &&
-      f.id !== id
-  );
-  if (exists) throw new Error(`File "${file.name}" already exists in target folder`);
-
-  const maxOrder = files
-    .filter((f) => f.parentId === newParentId)
-    .reduce((max, f) => Math.max(max, f.order), -1);
-
-  file.parentId = newParentId;
-  file.order = maxOrder + 1;
-  return { ...file };
+  return request<File>(`/files/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ parentId: newParentId }),
+  });
 }
 
 export async function reorderFiles(
   parentId: string,
   orderedIds: string[]
 ): Promise<void> {
-  await delay();
-  orderedIds.forEach((id, index) => {
-    const file = files.find((f) => f.id === id && f.parentId === parentId);
-    if (file) file.order = index;
+  return request("/files/reorder", {
+    method: "PATCH",
+    body: JSON.stringify({ parentId, orderedIds }),
   });
 }
 
 export async function renameFile(id: string, newName: string): Promise<File> {
-  await delay();
-  const file = files.find((f) => f.id === id);
-  if (!file) throw new Error("File not found");
-
-  const exists = files.some(
-    (f) =>
-      f.parentId === file.parentId &&
-      f.name.toLowerCase() === newName.toLowerCase() &&
-      f.id !== id
-  );
-  if (exists) throw new Error(`File "${newName}" already exists in this directory`);
-
-  const folderExists = folders.some(
-    (f) => f.parentId === file.parentId && f.name.toLowerCase() === newName.toLowerCase()
-  );
-  if (folderExists) throw new Error(`A folder named "${newName}" already exists in this directory`);
-
-  file.name = newName;
-  return { ...file };
+  return request<File>(`/files/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name: newName }),
+  });
 }
