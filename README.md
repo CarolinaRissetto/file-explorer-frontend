@@ -10,6 +10,11 @@ Explorador de arquivos e pastas com interface moderna.
 - shadcn-ui
 - Tailwind CSS
 
+## Pré-requisitos
+
+- **Node.js** 18+
+- Backend rodando (veja a pasta `file-explorer-backend`)
+
 ## Como executar
 
 ```sh
@@ -18,7 +23,9 @@ cp .env.example .env
 npm run dev
 ```
 
-Edite o `.env` e defina `VITE_API_URL` com a URL do backend (ex: `http://localhost:3001`).
+O `.env.example` já aponta para o backend local (`http://localhost:3001`). Se o backend estiver em outra URL, edite o `.env` e altere `VITE_API_URL`.
+
+**Rodar o projeto completo:** primeiro suba o backend (na pasta `file-explorer-backend`, com Docker e PostgreSQL), depois rode o frontend aqui.
 
 ### Deploy (Lovable / Vercel)
 

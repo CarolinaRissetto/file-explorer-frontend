@@ -1,4 +1,5 @@
-const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
+const raw = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API_BASE = (raw.startsWith("http://") || raw.startsWith("https://") ? raw : `https://${raw}`).replace(/\/$/, "");
 
 async function request<T>(
   path: string,
