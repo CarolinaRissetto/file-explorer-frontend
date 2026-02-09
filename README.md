@@ -13,12 +13,16 @@ Explorador de arquivos e pastas com interface moderna.
 ## Como executar
 
 ```sh
-# Instalar dependências
 npm install
-
-# Iniciar servidor de desenvolvimento
+cp .env.example .env
 npm run dev
 ```
+
+Edite o `.env` e defina `VITE_API_URL` com a URL do backend (ex: `http://localhost:3001`).
+
+### Deploy (Lovable / Vercel)
+
+Configure `VITE_API_URL` nas variáveis de ambiente do projeto com a URL do backend em produção.
 
 ## Scripts disponíveis
 

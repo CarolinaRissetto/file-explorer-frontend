@@ -1,10 +1,11 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+const API_BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
 
 async function request<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_BASE}${path}`;
+  const pathWithSlash = path.startsWith("/") ? path : `/${path}`;
+  const url = `${API_BASE}${pathWithSlash}`;
   const res = await fetch(url, {
     ...options,
     headers: {
