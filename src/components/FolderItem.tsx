@@ -1,4 +1,4 @@
-import { Folder as FolderIcon, Trash2 } from "lucide-react";
+import { Folder as FolderIcon, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FolderItemProps {
@@ -7,6 +7,7 @@ interface FolderItemProps {
   size: number;
   onNavigate: (id: string) => void;
   onDelete: (id: string) => void;
+  onRename: (id: string) => void;
 }
 
 export function FolderItem({
@@ -15,6 +16,7 @@ export function FolderItem({
   size,
   onNavigate,
   onDelete,
+  onRename,
 }: FolderItemProps) {
   const formatSize = (bytes: number) => {
     if (bytes === 0) return "Empty";
@@ -37,12 +39,10 @@ export function FolderItem({
           {formatSize(size)}
         </span>
       </button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7"
-        onClick={() => onDelete(id)}
-      >
+      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onRename(id)}>
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
+      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onDelete(id)}>
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
     </div>

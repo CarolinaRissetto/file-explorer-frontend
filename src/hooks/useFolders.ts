@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getFolders, getAllFolders, createFolder, deleteFolder } from "@/api/folders";
+import { getFolders, getAllFolders, createFolder, deleteFolder, renameFolder } from "@/api/folders";
 import type { Folder } from "@/types";
 
 export function useFolders(parentId: string | null) {
@@ -35,6 +35,17 @@ export function useDeleteFolder() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["folders"] });
       qc.invalidateQueries({ queryKey: ["files"] });
+    },
+  });
+}
+
+export function useRenameFolder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, newName }: { id: string; newName: string }) =>
+      renameFolder(id, newName),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["folders"] });
     },
   });
 }

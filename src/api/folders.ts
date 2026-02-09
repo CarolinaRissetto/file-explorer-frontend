@@ -60,3 +60,25 @@ function collectDescendantFolderIds(parentId: string): string[] {
   }
   return ids;
 }
+
+export async function renameFolder(id: string, newName: string): Promise<Folder> {
+  await delay();
+  const folder = folders.find((f) => f.id === id);
+  if (!folder) throw new Error("Folder not found");
+
+  const exists = folders.some(
+    (f) =>
+      f.parentId === folder.parentId &&
+      f.name.toLowerCase() === newName.toLowerCase() &&
+      f.id !== id
+  );
+  if (exists) throw new Error(`Folder "${newName}" already exists in this directory`);
+
+  const fileExists = files.some(
+    (f) => f.parentId === folder.parentId && f.name.toLowerCase() === newName.toLowerCase()
+  );
+  if (fileExists) throw new Error(`A file named "${newName}" already exists in this directory`);
+
+  folder.name = newName;
+  return { ...folder };
+}
