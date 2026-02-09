@@ -74,8 +74,8 @@ export function useReorderFiles() {
       parentId: string;
       orderedIds: string[];
     }) => reorderFiles(parentId, orderedIds),
-    onSuccess: (_, { parentId }) => {
-      qc.invalidateQueries({ queryKey: ["files", parentId] });
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["files"] });
     },
   });
 }

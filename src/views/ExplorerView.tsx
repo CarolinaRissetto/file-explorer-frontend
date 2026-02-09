@@ -43,9 +43,10 @@ export function ExplorerView() {
 
   const { items: sortedFiles, draggedId, onDragStart, onDragOver, onDragEnd } =
     useDragAndDrop(isSearching ? results.files : files, (orderedIds) => {
-      if (currentFolderId) {
-        reorderFiles.mutate({ parentId: currentFolderId, orderedIds });
-      }
+      reorderFiles.mutate({
+        parentId: currentFolderId ?? "__root__",
+        orderedIds,
+      });
     });
 
   const displayedFolders = isSearching ? results.folders : folders;
