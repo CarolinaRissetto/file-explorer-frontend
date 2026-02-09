@@ -87,3 +87,25 @@ export async function reorderFiles(
     if (file) file.order = index;
   });
 }
+
+export async function renameFile(id: string, newName: string): Promise<File> {
+  await delay();
+  const file = files.find((f) => f.id === id);
+  if (!file) throw new Error("File not found");
+
+  const exists = files.some(
+    (f) =>
+      f.parentId === file.parentId &&
+      f.name.toLowerCase() === newName.toLowerCase() &&
+      f.id !== id
+  );
+  if (exists) throw new Error(`File "${newName}" already exists in this directory`);
+
+  const folderExists = folders.some(
+    (f) => f.parentId === file.parentId && f.name.toLowerCase() === newName.toLowerCase()
+  );
+  if (folderExists) throw new Error(`A folder named "${newName}" already exists in this directory`);
+
+  file.name = newName;
+  return { ...file };
+}

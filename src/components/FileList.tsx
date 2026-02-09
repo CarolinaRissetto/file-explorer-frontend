@@ -5,6 +5,8 @@ interface FileListProps {
   files: File[];
   draggedId: string | null;
   onDelete: (id: string) => void;
+  onMove: (id: string) => void;
+  onRename: (id: string) => void;
   onDragStart: (id: string) => void;
   onDragOver: (e: React.DragEvent, id: string) => void;
   onDragEnd: () => void;
@@ -14,6 +16,8 @@ export function FileList({
   files,
   draggedId,
   onDelete,
+  onMove,
+  onRename,
   onDragStart,
   onDragOver,
   onDragEnd,
@@ -30,6 +34,8 @@ export function FileList({
           size={file.size}
           isDragged={file.id === draggedId}
           onDelete={onDelete}
+          onMove={onMove}
+          onRename={onRename}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
           onDragEnd={onDragEnd}

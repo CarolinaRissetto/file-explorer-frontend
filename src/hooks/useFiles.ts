@@ -6,6 +6,7 @@ import {
   deleteFile,
   moveFile,
   reorderFiles,
+  renameFile,
 } from "@/api/files";
 import type { File } from "@/types";
 
@@ -75,6 +76,17 @@ export function useReorderFiles() {
     }) => reorderFiles(parentId, orderedIds),
     onSuccess: (_, { parentId }) => {
       qc.invalidateQueries({ queryKey: ["files", parentId] });
+    },
+  });
+}
+
+export function useRenameFile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, newName }: { id: string; newName: string }) =>
+      renameFile(id, newName),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["files"] });
     },
   });
 }
