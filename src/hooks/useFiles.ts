@@ -38,6 +38,9 @@ export function useCreateFile() {
     }) => createFile(name, parentId, size),
     onSuccess: (_, { parentId }) => {
       qc.invalidateQueries({ queryKey: ["files", parentId] });
+      if (parentId === "__root__") {
+        qc.invalidateQueries({ queryKey: ["files", null] });
+      }
       qc.invalidateQueries({ queryKey: ["files", "all"] });
     },
   });
